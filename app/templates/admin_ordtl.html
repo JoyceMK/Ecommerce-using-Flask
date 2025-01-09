@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +10,7 @@
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #f8f9fa;
+            background-color: #f0efef;  /* Light red background */
             color: #495057;
             margin: 0;
             padding: 0;
@@ -22,8 +23,9 @@
         h1 {
             font-size: 32px;
             font-weight: 600;
-            color: #343a40;
+            color: #721c24;  /* Dark red text */
             margin-bottom: 30px;
+            text-align: center;
         }
 
         .table {
@@ -33,7 +35,7 @@
         }
 
         .table th {
-            background-color: #007bff;
+            background-color: #e60000;  /* Dark red background */
             color: #fff;
             font-weight: 600;
         }
@@ -42,7 +44,8 @@
             background-color: #ffffff;
         }
 
-        .table-bordered td, .table-bordered th {
+        .table-bordered td,
+        .table-bordered th {
             border: 1px solid #e1e1e1;
         }
 
@@ -54,26 +57,30 @@
         }
 
         .btn-back {
-            background-color: #007bff;
-            border-color: #007bff;
+            background-color: #e60000;  /* Light red button */
+            border-color: #e60000;
+            color: white;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 10px 20px;
+            
+        }
+
+        .btn-back:hover {
+            background-color: #c40000;  /* Darker red on hover */
+            border-color: #c40000;
+        }
+
+        .btn-update {
+            background-color: #28a745;  /* Green button for update */
+            border-color: #28a745;
+            color: #fff;
             font-weight: 600;
             border-radius: 8px;
         }
 
-        .btn-back:hover {
-            background-color: #0572e6;
-            border-color: #007bff;
-        }
-
-        .btn-update {
-            background-color: #28a745;
-            border-color: #28a745;
-            color: #fff;
-            font-weight: 600;
-        }
-
         .btn-update:hover {
-            background-color: #218838;
+            background-color: #218838;  /* Dark green on hover */
             border-color: #218838;
         }
 
@@ -81,19 +88,28 @@
             max-height: 500px;
             overflow-y: auto;
         }
+
+        .alert-warning {
+            background-color: #f8d7da; /* Light red background for no orders */
+            color: #721c24;
+            font-weight: bold;
+            text-align: center;
+            padding: 10px;
+            border-radius: 5px;
+        }
     </style>
 </head>
+
 <body>
 
     <div class="container">
-        <h1 class="text-center">Order Details</h1>
+        <h1>Order Details</h1>
 
         {% if orders %}
             <div class="table-responsive">
                 <table class="table table-bordered">
                     <thead>
                         <tr>
-                            <th>Order ID</th>
                             <th>Product Image</th>
                             <th>Product Name</th>
                             <th>User Name</th>
@@ -104,13 +120,11 @@
                     <tbody>
                         {% for order, product, user in orders %}
                             <tr>
-                                <td>{{ order.id }}</td>
-                                <td><img src="http://127.0.0.1:5000/{{ product.image_url }}" class="product-image" alt="{{ product.name }}"></td>
+                                <td><center><img src="http://127.0.0.1:5000/{{ product.image_url }}" class="product-image" alt="{{ product.name }}"></center></td>
                                 <td>{{ product.name }}</td>
                                 <td>{{ user.name }}</td>
                                 <td>{{ order.quantity }}</td>
                                 <td>
-                                    <!-- Form for status update -->
                                     <form action="{{ url_for('main.update_order_status') }}" method="POST" class="d-flex">
                                         <input type="hidden" name="order_id" value="{{ order.id }}">
                                         <select name="status" class="form-control">
@@ -128,7 +142,7 @@
                 </table>
             </div>
         {% else %}
-            <div class="alert alert-warning text-center" role="alert">
+            <div class="alert alert-warning" role="alert">
                 No orders found.
             </div>
         {% endif %}
@@ -138,10 +152,10 @@
         </div>
     </div>
 
-    <!-- Optional: Add Bootstrap JS (for better interaction) -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 </body>
+
 </html>

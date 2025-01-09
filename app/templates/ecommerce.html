@@ -1,107 +1,213 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-commerce Homepage</title>
-    <!-- Bootstrap CSS for styling -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <title>User Dashboard - Products</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <style>
+        body {
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            margin-top: 30px;
+        }
+
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .card img {
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            max-height: 200px;
+            max-width: 200px;
+            align-self: center;
+            object-fit: fill;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .card-text {
+            font-size: 14px;
+            color: #777;
+        }
+
+        .price {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ff5722;
+        }
+
+        .btn-primary {
+            background-color: #ff5722;
+            border: none;
+            font-weight: bold;
+            border-radius: 5px;
+        }
+
+        .btn-primary:hover {
+            background-color: #e64a19;
+        }
+
+        .btn-info {
+            background-color: #17a2b8;
+            border: none;
+            font-weight: bold;
+        }
+
+        .btn-info:hover {
+            background-color: #138496;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            border: none;
+            font-weight: bold;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            font-family: Georgia, 'Times New Roman', Times, serif;
+        }
+
+        h3 {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .navbar {
+            background-color: #ff5722;
+            height: 60px;
+            text-align: center;
+            padding-bottom: 40px;
+            color: white;
+        }
+
+        .logo {
+            padding-top: 10px;
+            font-family: Georgia, 'Times New Roman', Times, serif;
+            font-weight: bold;
+        }
+
+        .custom-btn {
+            background-color: white;
+            color: #e64a19;
+            border: 1px solid #e64a19;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .custom-btn:hover {
+            background-color: #ffcc80;
+            color: #e64a19;
+            border: 1px solid #e64a19;
+        }
+    </style>
 </head>
+
 <body>
 
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <h4 class="logo">Mobile World</h4>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <form action="{{ url_for('main.login') }}" method="GET" style="display: inline;">
+                            <button type="submit" class="btn btn-success custom-btn">Login</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
     <div class="container">
-        <a class="navbar-brand" href="#">E-Shop</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Shop</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">About</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Contact</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('main.login') }}" data-toggle="modal" data-target="#loginModal">Login</a>
-                </li>
-            </ul>
+        <h3>Mobile Phones</h3>
+
+        <!-- Products Grid -->
+        <div class="row">
+            {% for product in products %}
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <!-- Product Image -->
+                    <img src="{{ product.image_url }}" class="card-img-top" alt="{{ product.name }}">
+                    <div class="card-body">
+                        <!-- Product Details -->
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text">{{ product.description }}</p>
+                        <p class="price">Price: Rs {{ product.price }}</p>
+
+                        <!-- Trigger Buy Modal -->
+                        <button class="btn btn-primary btn-block" data-toggle="modal" data-target="#orderSuccessModal">Buy</button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
         </div>
     </div>
-</nav>
 
-
-
-<!-- Item Cards -->
-<div class="container my-5">
-    <div class="row">
-        <div class="col-md-4">
-            <div class="card">
-                <img src="https://via.placeholder.com/350x250" class="card-img-top" alt="Item 1">
-                <div class="card-body">
-                    <h5 class="card-title">Product 1</h5>
-                    <p class="card-text">Description of Product 1.</p>
-                    <p><strong>$25.00</strong></p>
-                    <button class="btn btn-primary add-to-cart">Add to Cart</button>
+    <!-- Modal -->
+    <div class="modal fade" id="orderSuccessModal" tabindex="-1" role="dialog" aria-labelledby="orderSuccessModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderSuccessModalLabel">Need to login</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
-            </div>
-        </div>
-        
-        <div class="col-md-4">
-            <div class="card">
-                <img src="https://via.placeholder.com/350x250" class="card-img-top" alt="Item 2">
-                <div class="card-body">
-                    <h5 class="card-title">Product 2</h5>
-                    <p class="card-text">Description of Product 2.</p>
-                    <p><strong>$30.00</strong></p>
-                    <button class="btn btn-primary add-to-cart">Add to Cart</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card">
-                <img src="https://via.placeholder.com/350x250" class="card-img-top" alt="Item 3">
-                <div class="card-body">
-                    <h5 class="card-title">Product 3</h5>
-                    <p class="card-text">Description of Product 3.</p>
-                    <p><strong>$20.00</strong></p>
-                    <button class="btn btn-primary add-to-cart">Add to Cart</button>
+                <div class="modal-body">
+                    <p>You have to login to place an order.</p>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Footer -->
-<footer class="bg-light py-4">
-    <div class="container text-center">
-        <p>&copy; 2025 E-Shop. All Rights Reserved.</p>
-    </div>
-</footer>
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-<!-- Bootstrap JS and dependencies -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
-<script>
-    // Add to Cart functionality (for demo purposes)
-    document.querySelectorAll('.add-to-cart').forEach(function(button) {
-        button.addEventListener('click', function() {
-            alert('Item added to cart!');
+    <script>
+        // Redirect to login page after modal is shown
+        $('#orderSuccessModal').on('shown.bs.modal', function () {
+            setTimeout(function () {
+                window.location.href = "{{ url_for('main.login') }}"; // Redirect to the login page
+            }, 3000); // 3 seconds delay before redirecting
         });
-    });
-</script>
-
+    </script>
 </body>
+
 </html>

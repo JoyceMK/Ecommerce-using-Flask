@@ -13,7 +13,8 @@ main = Blueprint('main', __name__)
 
 @main.route('/')
 def home():
-    return render_template('login.html')
+    products = Product.query.all() 
+    return render_template('ecommerce.html', products=products)
 
 login_manager = LoginManager(main)
 login_manager.init_app(main)
@@ -76,7 +77,11 @@ def login():
 
 
 @main.route('/admin/dashboard', methods=['GET'])
+@login_required
+
 def admin_dashboard():
+    if 'user_id' not in session or not session.get('is_admin'):
+        return redirect(url_for('main.home'))
     products = Product.query.all()  
 
     return render_template('admin_home.html', products=products)
@@ -94,10 +99,10 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @main.route('/add_product', methods=['GET', 'POST'])
+@login_required
 def add_product():
     # Check if user is logged in and is an admin
     if 'user_id' not in session or not session.get('is_admin'):
-        flash('You need to be an admin to add products.', 'danger')
         return redirect(url_for('main.home'))
 
     if request.method == 'POST':
@@ -138,7 +143,12 @@ def add_product():
 
 
 @main.route('/view_orders')
+@login_required
+
 def view_orders():
+    if 'user_id' not in session or not session.get('is_admin'):
+        return redirect(url_for('main.home'))
+
     # Fetch all orders, joining with the Product and User tables, sorted by order_id
     orders = db.session.query(Order, Product, User).join(Product, Order.product_id == Product.id).join(User, Order.user_id == User.id).order_by(Order.id).all()
     return render_template('admin_ordtl.html', orders=orders)
@@ -148,13 +158,23 @@ def view_orders():
 
 
 @main.route('/view_users')
+@login_required
+
 def view_users():
+    if 'user_id' not in session or not session.get('is_admin'):
+        return redirect(url_for('main.home'))
     # Fetch all users
     users = User.query.all()  # Assuming you have a 'User' model
     return render_template('admin_users.html', users=users)
 
+
 @main.route('/update_order_status', methods=['POST'])
+@login_required
+
 def update_order_status():
+    if 'user_id' not in session or not session.get('is_admin'):
+        return redirect(url_for('main.home'))
+
     order_id = request.form.get('order_id')
     new_status = request.form.get('status')
     
@@ -167,7 +187,13 @@ def update_order_status():
 
 
 @main.route('/admin/delete_product/<int:product_id>', methods=['POST'])
+@login_required
+
 def delete_product(product_id):
+    if 'user_id' not in session or not session.get('is_admin'):
+        return redirect(url_for('main.home'))
+    
+
     product = Product.query.get(product_id)
     if product:
         db.session.delete(product)

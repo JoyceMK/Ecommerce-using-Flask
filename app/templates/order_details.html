@@ -113,9 +113,14 @@
                         <!-- Price and Cancel Order Button on the Same Line -->
                         <div class="d-flex justify-content-between align-items-center">
                             <p class="price">Price: Rs {{ product.price }}</p>
-                            <form action="{{ url_for('main.cancel_order', order_id=order.id) }}" method="POST">
-                                <button type="submit" class="btn btn-danger">Cancel Order</button>
-                            </form>
+                            <div>
+                                {% if order.status!="Delivered" %}
+                                <form action="{{ url_for('main.cancel_order', order_id=order.id) }}" method="POST">
+                                    <button type="submit" class="btn btn-danger">Cancel Order</button>
+                                </form>
+                                {% endif %}
+                            </div>
+                            
                         </div>
 
                         <p class="quantity">Quantity: {{ order.quantity }}</p>

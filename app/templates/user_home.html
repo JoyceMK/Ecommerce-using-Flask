@@ -115,6 +115,20 @@
         .logo{
             padding-top: 10px;
             font-family: Georgia, 'Times New Roman', Times, serif;
+
+            font-weight: bold;
+        }
+        .uname{
+            font-size: 20px;
+            padding-right: 15px;
+            font-family: Georgia, 'Times New Roman', Times, serif;
+            padding-top: 10px;
+        }
+        .logout{
+            padding-top: 8px;
+        }
+        .mobile{
+            font-family:Verdana, Geneva, Tahoma, sans-serif;
             font-weight: bold;
         }
     </style>
@@ -131,20 +145,11 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Home</a>
+                        <p class="uname">Welcome, <b>{{ user.name }}!</b><p>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Shop</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">About</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Contact</a>
-                    </li>
-                    <li class="nav-item">
+                    <li class="nav-item logout">
                         <form action="{{ url_for('main.logout') }}" method="GET" style="display: inline;">
-                            <button type="submit" class="btn btn-danger">Logout</button>
+                            <button type="submit" class="btn btn-danger ">Logout</button>
                         </form>
                     </li>
                 </ul>
@@ -154,7 +159,7 @@
     <div class="container">
         <!-- Header Row -->
         <div class="header-row">
-            <h1>Welcome, {{ user.name }}!</h1>
+            <h4 class="mobile">Mobile Phones</h4>
             <div class="header-actions">
                 <form action="{{ url_for('main.order_details') }}" method="GET" style="display: inline;">
                     <button type="submit" class="btn btn-info">View Order Details</button>
@@ -162,7 +167,7 @@
             </div>
         </div>
 
-        <h3>Mobile Phones</h3>
+        
 
         <!-- Products Grid -->
         <div class="row">
