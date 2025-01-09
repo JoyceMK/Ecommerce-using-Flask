@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+        }
+    
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: #343a40;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding-top: 30px;
+            padding-bottom: 20px;
+        }
+    
+        .sidebar .logo {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+    
+        .sidebar a {
+            color: #d1d1d1;
+            padding: 10px 20px;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 10px;
+            font-size: 18px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+    
+        .sidebar a:hover {
+            background-color: #495057;
+        }
+    
+        .sidebar .logout-btn {
+            color: #ffffff;
+            font-size: 14px;
+            background-color: #dc3545;
+            padding: 12px 20px;
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            border: none;
+            text-align: center;
+            border-radius: 8px;
+        }
+    
+        .sidebar .logout-btn:hover {
+            background-color: #c82333;
+        }
+    
+        /* Main content */
+        .main-content {
+            margin-left: 260px;
+            padding: 30px;
+        }
+    
+        .main-content h1 {
+            font-size: 32px;
+            color: #343a40;
+            margin-bottom: 30px;
+        }
+    
+        .row {
+            display: flex;
+            flex-direction: column;  /* Stack items vertically */
+            gap: 20px;
+        }
+    
+        .col-md-12 {
+            width: 100%;  /* Full width for each product */
+            margin-bottom: 20px;
+        }
+    
+        /* Card Styling */
+        .card {
+            border: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: row; /* Display image and details side by side */
+            width: 1000px;
+            overflow: hidden;
+            background-color: white;
+        }
+    
+        .product-image {
+            width: 200px;
+            height: 200px;
+            object-fit: fill;
+            margin-right: 20px;
+        }
+    
+        .card-body {
+            flex-grow: 1; /* Take up the remaining space */
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Ensure space between the content and the delete button */
+        }
+    
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+    
+        .card-text {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 10px;
+            margin-right: 30px; /* Add space for the delete button */
+        }
+    
+        .btn-danger {
+            align-self: flex-end; /* Align delete button to the right */
+            font-size: 14px;
+        }
+    
+        /* Responsive for smaller screens */
+        @media (max-width: 768px) {
+            .card {
+                flex-direction: column;
+            }
+            .product-image {
+                width: 100%;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">Admin Panel</div>
+        <a href="{{url_for('main.add_product')}}">Add Product</a>
+        <a href="{{url_for('main.view_orders')}}">View Orders</a>
+        <a href="{{url_for('main.view_users')}}">List of Users</a>
+        <a href="{{url_for('main.logout')}}" class="btn btn-danger btn-block">Logout</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <h1>Welcome to the Admin Dashboard</h1>
+
+        <!-- Product Listing -->
+        <div class="row">
+            {% for product in products %}
+                <div class="col-md-4 col-sm-12">
+                    <div class="card">
+                        <img src="http://127.0.0.1:5000/{{ product.image_url }}" class="product-image" alt="{{ product.name }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text">{{ product.description }}</p>
+                            <p class="card-text">Price: Rs {{ product.price }}</p>
+                            <!-- Delete Button -->
+                            <form action="{{ url_for('main.delete_product', product_id=product.id) }}" method="POST">
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <p>No products found.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Optional: Add Bootstrap JS (for better interaction) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f5f5f5;
+        }
+        .container {
+            margin-top: 30px;
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        .card img {
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            max-height: 200px;
+            object-fit: fill;
+            width: 200px;
+        }
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        .card-text {
+            font-size: 14px;
+            color: #777;
+        }
+        .price {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ff5722;
+        }
+        .quantity {
+            font-size: 14px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        h1 {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .btn-back {
+            background-color: #17a2b8;
+            color: #fff;
+            font-weight: bold;
+        }
+        .btn-back:hover {
+            background-color: #138496;
+            color: #fff;
+        }
+        .status-bar {
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+            padding: 10px 0;
+        }
+        .progress {
+            height: 10px;
+            border-radius: 5px;
+            width: 100%;
+            background-color: #ddd;
+            position: relative;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 10px;
+            border-radius: 5px;
+            position: absolute;
+        }
+        .status-text {
+            font-size: 14px;
+            color: #555;
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Order Details</h1>
+
+        <!-- Back Button -->
+        <div class="mb-4">
+            <a href="{{ url_for('main.user_dashboard') }}" class="btn btn-back">Back to Dashboard</a>
+        </div>
+
+        <!-- Orders List -->
+        {% for order, product in orders %}
+        <div class="card">
+            <div class="row no-gutters">
+                <!-- Product Image -->
+                <div class="col-md-4">
+                    <img src="{{ product.image_url }}" class="card-img" alt="{{ product.name }}">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <!-- Product Details -->
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text">{{ product.description }}</p>
+
+                        <!-- Price and Cancel Order Button on the Same Line -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <p class="price">Price: Rs {{ product.price }}</p>
+                            <form action="{{ url_for('main.cancel_order', order_id=order.id) }}" method="POST">
+                                <button type="submit" class="btn btn-danger">Cancel Order</button>
+                            </form>
+                        </div>
+
+                        <p class="quantity">Quantity: {{ order.quantity }}</p>
+                        <p class="card-text">
+                            <small class="text-muted">Ordered on: {{ order.created_at.strftime('%d %b %Y, %H:%M %p') }}</small>
+                        </p>
+
+                        <!-- Delivery Status Bar -->
+                        <div class="status-bar">
+                            <div class="progress">
+                                <div class="progress-bar"
+                                    style="width: {{ '25' if order.status == 'Order Placed' else '50' if order.status == 'Dispatched' else '75' if order.status == 'Out for Delivery' else '100' if order.status == 'Delivered' else '0' }}%;
+                                            background-color: {{ '#ff9800' if order.status == 'Order Placed' else '#2196f3' if order.status == 'Dispatched' else '#ffc107' if order.status == 'Out for Delivery' else '#4caf50' if order.status == 'Delivered' else '#ddd' }};">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Status Text -->
+                        <div class="status-text">
+                            {% if order.status == "Order Placed" %}
+                            <span>Order Placed</span>
+                            {% elif order.status == "Dispatched" %}
+                            <span>Dispatched</span>
+                            {% elif order.status == "Out for Delivery" %}
+                            <span>Out for Delivery</span>
+                            {% elif order.status == "Delivered" %}
+                            <span>Delivered</span>
+                            {% else %}
+                            <span>Pending</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Cancel Order Modal -->
+    <div class="modal fade" id="cancelModal" tabindex="-1" role="dialog" aria-labelledby="cancelModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cancelModalLabel">Order Canceled</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Your order has been successfully canceled.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <a href="{{ url_for('main.order_details') }}" class="btn btn-primary">Go to Orders</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
