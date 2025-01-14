@@ -70,6 +70,21 @@
 
 <div class="register-card">
     <h2>Register</h2>
+
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
     <form method="POST" action="{{ url_for('main.register') }}">
         <div class="form-group">
             <input type="text" class="form-control" id="name" name="name" placeholder="Enter your name" required>
@@ -86,6 +101,16 @@
         <p>Already have an account? <a href="{{ url_for('main.login') }}">Login here</a></p>
     </div>
 </div>
+
+<script>
+    // Automatically clear flash messages after 5 seconds
+    setTimeout(function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => alert.remove());
+    }, 5000);
+</script>
+
+
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.1/dist/umd/popper.min.js"></script>

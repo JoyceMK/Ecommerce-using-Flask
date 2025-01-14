@@ -37,7 +37,6 @@ def register():
         new_user = User(name=name, email=email, password=password_hash)
         db.session.add(new_user)
         db.session.commit()
-        flash('Registration successful! You can now log in.', 'success')
         return redirect(url_for('main.login'))
 
     return render_template('register.html')
@@ -47,7 +46,7 @@ def register():
 
 @main.route('/login', methods=['GET', 'POST'])
 def login():
-    if current_user.is_authenticated:  # Prevent logged-in users from accessing login
+    if current_user.is_authenticated:  
         flash('You are already logged in.', 'info')
         return redirect(url_for('main.user_dashboard')) if not current_user.is_admin else redirect(url_for('main.admin_dashboard'))
 
@@ -56,16 +55,14 @@ def login():
         password = request.form.get('password')
         user = User.query.filter_by(email=email).first()
 
-        if user and check_password_hash(user.password, password):  # Validate credentials
-            login_user(user)  # Login user with Flask-Login
+        if user and check_password_hash(user.password, password):  
+            login_user(user) 
             
-            # Set custom session attributes
             session['user_id'] = user.id
             session['is_admin'] = user.is_admin
 
             flash('Login successful!', 'success')
 
-            # Redirect based on user role
             return redirect(url_for('main.admin_dashboard' if user.is_admin else 'main.user_dashboard'))
         else:
             flash('Invalid email or password.', 'danger')
@@ -101,37 +98,31 @@ def allowed_file(filename):
 @main.route('/add_product', methods=['GET', 'POST'])
 @login_required
 def add_product():
-    # Check if user is logged in and is an admin
     if 'user_id' not in session or not session.get('is_admin'):
         return redirect(url_for('main.home'))
 
     if request.method == 'POST':
-        # Retrieve form data
         name = request.form['name']
         description = request.form['description']
         price = request.form['price']
 
-        # Handle image upload
         image = request.files['image']
         if image and allowed_file(image.filename):
-            # Secure the filename and save it to the static folder
             filename = secure_filename(image.filename)
             image_path = os.path.join(UPLOAD_FOLDER, filename)
-            image.save(os.path.join('app', image_path))  # Update with actual app directory path
+            image.save(os.path.join('app', image_path))  
 
         else:
             flash('Invalid image format. Only PNG, JPG, JPEG, GIF are allowed.', 'danger')
             return redirect(request.url)
 
-        # Create a new Product object
         new_product = Product(
             name=name,
             description=description,
             price=price,
-            image_url=image_path  # Store image path in the database
+            image_url=image_path 
         )
 
-        # Add product to the database
         db.session.add(new_product)
         db.session.commit()
 
@@ -149,7 +140,6 @@ def view_orders():
     if 'user_id' not in session or not session.get('is_admin'):
         return redirect(url_for('main.home'))
 
-    # Fetch all orders, joining with the Product and User tables, sorted by order_id
     orders = db.session.query(Order, Product, User).join(Product, Order.product_id == Product.id).join(User, Order.user_id == User.id).order_by(Order.id).all()
     return render_template('admin_ordtl.html', orders=orders)
 
@@ -163,8 +153,7 @@ def view_orders():
 def view_users():
     if 'user_id' not in session or not session.get('is_admin'):
         return redirect(url_for('main.home'))
-    # Fetch all users
-    users = User.query.all()  # Assuming you have a 'User' model
+    users = User.query.all()  
     return render_template('admin_users.html', users=users)
 
 
@@ -247,17 +236,14 @@ def confirm_order(product_id):
 @main.route('/order_details')
 @login_required
 def order_details():
-    # Fetch orders for the logged-in user, joining with the Product table to get product details
     orders = db.session.query(Order, Product).join(Product, Order.product_id == Product.id) \
         .filter(Order.user_id == current_user.id) \
-        .order_by(desc(Order.created_at))  # Sort orders by created_at in descending order
+        .order_by(desc(Order.created_at))  
 
-    # Convert created_at to local timezone (Asia/Kolkata in this example)
-    local_tz = timezone('Asia/Kolkata')  # Replace with your local timezone if needed
+    local_tz = timezone('Asia/Kolkata')  
     orders_list = orders.all()
 
     for order, product in orders_list:
-        # Convert created_at from UTC to local timezone
         order.created_at = order.created_at.astimezone(local_tz)
     
     return render_template('order_details.html', orders=orders_list)
@@ -272,7 +258,6 @@ def cancel_order(order_id):
     
     if order:
         try:
-            # Delete the order
             db.session.delete(order)
             db.session.commit()
             flash('Your order has been successfully canceled.', 'success')
@@ -282,7 +267,6 @@ def cancel_order(order_id):
     else:
         flash('Order not found!', 'danger')
     
-    # Redirect back to the orders page with the modal showing
     return redirect(url_for('main.order_details'))
 
 
