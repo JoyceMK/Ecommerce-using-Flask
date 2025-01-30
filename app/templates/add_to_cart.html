@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <style>
+        body {
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            margin-top: 30px;
+        }
+
+        .cart-card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .cart-img {
+            max-width: 100px;
+            max-height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        .price {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ff5722;
+        }
+
+        .total-price {
+            font-size: 18px;
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        .quantity-input {
+            width: 60px;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background-color: #ff5722;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #e64a19;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            border: none;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .address-form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        /* Flexbox layout for cart items and address form */
+        .cart-and-address {
+            display: flex;
+            justify-content: space-between;
+            gap: 30px;
+        }
+
+        .cart-items {
+            flex: 1;
+        }
+
+        .address-area {
+            width: 400px;
+        }
+    </style>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+</head>
+
+<body>
+
+    <div class="container">
+        <h2 class="mb-4">Your Shopping Cart</h2>
+
+        <!-- Cart Items and Address Form -->
+        <div class="cart-and-address">
+            <div class="cart-items">
+                <!-- Cart Items -->
+                <div class="row">
+                    {% for cart, product in cart_items %}
+                    <div class="col-md-12">
+                        <div class="cart-card d-flex align-items-center">
+                            <img src="{{ product.image_url }}" alt="{{ product.name }}" class="cart-img mr-3">
+                            <div class="flex-grow-1">
+                                <h5>{{ product.name }}</h5>
+                                <p class="price">Price: Rs {{ product.price }}</p>
+                                <p>Quantity: <input type="number" value="{{ cart.quantity }}" min="1" class="quantity-input"
+                                        data-cart-id="{{ cart.id }}" data-price="{{ product.price }}"></p>
+                                <p class="total-price">Total: Rs <span id="total-{{ cart.id }}">{{ cart.quantity * product.price }}</span></p>
+                            </div>
+                            <form action="{{ url_for('main.remove_from_cart', cart_id=cart.id) }}" method="POST">
+                                <button type="submit" class="btn btn-danger ml-3">Remove</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="address-area">
+                <!-- Address Form -->
+                <div class="address-form">
+                    <h4>Enter Delivery Address</h4>
+                    <form method="POST">
+                        <div class="form-group">
+                            <label for="address">Address</label>
+                            <textarea id="address" name="address" class="form-control" rows="4" placeholder="Enter your delivery address here" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="text" id="phone" name="phone" class="form-control" placeholder="Enter your phone number" required>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cart Summary -->
+        <div class="mt-4">
+            <h4>Total Amount: Rs <span id="cart-total">{{ total_price }}</span></h4>
+            <button id="pay-btn" class="btn btn-primary checkout-btn">Proceed to Payment</button>
+        </div>
+    </div>
+
+    <!-- Razorpay Script -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <!-- Quantity and Total Price Update Script -->
+    <script>
+        $(document).ready(function () {
+            $(".quantity-input").on("input", function () {
+                var cartId = $(this).data("cart-id");
+                var price = parseFloat($(this).data("price"));
+                var quantity = parseInt($(this).val()) || 1;
+
+                var total = quantity * price;
+                $("#total-" + cartId).text(total.toFixed(2));
+
+                updateCartTotal();
+            });
+
+            function updateCartTotal() {
+                var newTotal = 0;
+                $(".quantity-input").each(function () {
+                    var price = parseFloat($(this).data("price"));
+                    var quantity = parseInt($(this).val()) || 1;
+                    newTotal += quantity * price;
+                });
+                $("#cart-total").text(newTotal.toFixed(2));
+            }
+
+            document.getElementById('pay-btn').onclick = function(e) {
+                e.preventDefault();
+        
+                // Get the total price from the page
+                var totalAmount = parseFloat(document.getElementById("cart-total").innerText) * 100; // Convert to paise
+        
+                // Fetch user details from Flask variables (set these in your Flask view)
+                var userName = "{{ current_user.name }}";  // Ensure `current_user.name` is available in Flask
+                var userEmail = "{{ current_user.email }}"; // Ensure `current_user.email` is available in Flask
+        
+                var options = {
+                    "key": "rzp_test_FuqIwgrQeAAtNt", // Replace with your Razorpay Key ID
+                    "amount": totalAmount *100, // Use dynamic total amount
+                    "currency": "INR",
+                    "name": userName, // Use logged-in user's name
+                    "description": "Order Payment",
+                    "image": "https://example.com/your_logo.png",  // Your company logo
+                    "order_id": "{{ order_id }}", // Replace with dynamic order ID from backend
+                    "handler": function(response) {
+                        alert("Payment successful. Payment ID: " + response.razorpay_payment_id);
+                        // Here you can send this response to your backend for verification
+                    },
+                    "prefill": {
+                        "name": userName, // User's name
+                        "email": userEmail, // User's email
+                        "contact": "8606422387" // You can fetch this dynamically as well
+                    },
+                    "theme": {
+                        
+                        "color": "#F37254"
+                    }
+                };
+        
+                var rzp1 = new Razorpay(options);
+                rzp1.open();
+            };
+        });
+    </script>
+
+</body>
+
+</html>

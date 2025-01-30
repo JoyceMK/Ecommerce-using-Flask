@@ -23,9 +23,8 @@ def create_app():
     login_manager.init_app(app)
 
     # Set the login view
-    login_manager.login_view = 'main.login'  # Update with your actual login route
+    login_manager.login_view = 'main.login'  
 
-    # User loader function for Flask-Login
     @login_manager.user_loader
     def load_user(user_id):
         from .models import User

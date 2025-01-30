@@ -20,7 +20,6 @@
             border: none;
             border-radius: 10px;
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-            
         }
 
         .card img {
@@ -84,7 +83,7 @@
             font-size: 28px;
             font-weight: bold;
             margin-bottom: 20px;
-            font-family:Georgia, 'Times New Roman', Times, serif
+            font-family: Georgia, 'Times New Roman', Times, serif;
         }
 
         h3 {
@@ -105,37 +104,39 @@
             gap: 10px;
         }
 
-        .navbar{
+        .navbar {
             background-color: #ff5722;
             height: 60px;
             text-align: center;
             padding-bottom: 40px;
             color: white;
         }
-        .logo{
+
+        .logo {
             padding-top: 10px;
             font-family: Georgia, 'Times New Roman', Times, serif;
-
             font-weight: bold;
         }
-        .uname{
+
+        .uname {
             font-size: 20px;
             padding-right: 15px;
             font-family: Georgia, 'Times New Roman', Times, serif;
             padding-top: 10px;
         }
-        .logout{
+
+        .logout {
             padding-top: 8px;
         }
-        .mobile{
-            font-family:Verdana, Geneva, Tahoma, sans-serif;
+
+        .mobile {
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
             font-weight: bold;
         }
     </style>
 </head>
 
 <body>
-
     <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container">
             <h4 class="logo">Mobile World</h4>
@@ -145,11 +146,11 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
-                        <p class="uname">Welcome, <b>{{ user.name }}!</b><p>
+                        <p class="uname">Welcome, <b>{{ user.name }}!</b></p>
                     </li>
                     <li class="nav-item logout">
                         <form action="{{ url_for('main.logout') }}" method="GET" style="display: inline;">
-                            <button type="submit" class="btn btn-danger ">Logout</button>
+                            <button type="submit" class="btn btn-danger">Logout</button>
                         </form>
                     </li>
                 </ul>
@@ -157,35 +158,35 @@
         </div>
     </nav>
     <div class="container">
-        <!-- Header Row -->
         <div class="header-row">
             <h4 class="mobile">Mobile Phones</h4>
             <div class="header-actions">
                 <form action="{{ url_for('main.order_details') }}" method="GET" style="display: inline;">
                     <button type="submit" class="btn btn-info">View Order Details</button>
                 </form>
+                <form action="{{ url_for('main.cart') }}" method="GET" style="display: inline;">
+                    <button type="submit" class="btn btn-warning">Go to Cart</button>
+                </form>
             </div>
         </div>
 
-        
-
-        <!-- Products Grid -->
         <div class="row">
             {% for product in products %}
                 <div class="col-md-4 mb-4">
                     <div class="card">
-                        <!-- Product Image -->
                         <img src="{{ product.image_url }}" class="card-img-top" alt="{{ product.name }}">
                         <div class="card-body">
-                            <!-- Product Details -->
                             <h5 class="card-title">{{ product.name }}</h5>
                             <p class="card-text">{{ product.description }}</p>
                             <p class="price">Price: Rs {{ product.price }}</p>
-
-                            <!-- Buy Button -->
-                            <form action="{{ url_for('main.buy_now', product_id=product.id) }}" method="POST">
-                                <button type="submit" class="btn btn-primary btn-block">Buy</button>
-                            </form>
+                            <div class="d-flex justify-content-between">
+                                <form action="{{ url_for('main.buy_now', product_id=product.id) }}" method="POST">
+                                    <button type="submit" class="btn btn-primary">Buy</button>
+                                </form>
+                                <form action="{{ url_for('main.add_to_cart', product_id=product.id) }}" method="POST">
+                                    <button type="submit" class="btn btn-secondary">Add to Cart</button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -193,10 +194,8 @@
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
-
 </html>

@@ -47,3 +47,22 @@ class Order(db.Model):
 
     def __repr__(self):
         return f"<Order {self.status}>"
+
+
+
+class Cart(db.Model):
+    __tablename__ = 'cart'  
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    quantity = db.Column(db.Integer, default=1)
+
+    # Relationships
+    user = db.relationship('User', backref=db.backref('cart', lazy=True, cascade="all, delete-orphan"))
+    product = db.relationship('Product', backref=db.backref('cart', lazy=True, cascade="all, delete-orphan"))
+
+    def __repr__(self):
+        return f"<Cart User: {self.user_id}, Product: {self.product_id}, Quantity: {self.quantity}>"
+
+

@@ -130,6 +130,13 @@
             color: #e64a19;
             border: 1px solid #e64a19;
         }
+        #blog{
+            color: white;
+            padding-right: 20px;
+        }
+        #homepg{
+            color: white;
+        }
     </style>
 </head>
 
@@ -144,9 +151,18 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
+                        <a class="nav-link active" id="homepg" aria-current="page" href="#">Home</a>
+                      </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" id="blog" aria-current="page" href="#">Blog</a>
+                      </li>
+                    <li class="nav-item">
                         <form action="{{ url_for('main.login') }}" method="GET" style="display: inline;">
                             <button type="submit" class="btn btn-success custom-btn">Login</button>
                         </form>
+
+                         
+                        
                     </li>
                 </ul>
             </div>

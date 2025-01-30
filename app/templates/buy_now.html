@@ -1,171 +1,256 @@
-<!DOCTYPE html>
-<html lang="en">
+    <!DOCTYPE html>
+    <html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buy Product</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <style>
-        body {
-            background-color: #f5f5f5;
-        }
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Buy Product</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <style>
+            
+            body {
+                background-color: #f5f5f5;
+            }
 
-        .container {
-            margin-top: 50px;
-        }
+            .container {
+                margin-top: 50px;
+            }
 
-        .card {
-            margin-bottom: 20px;
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-        }
+            .card {
+                margin-bottom: 20px;
+                border: none;
+                border-radius: 10px;
+                box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            }
+            
+            .buyp{
+                color: #e64a19;
+                font-family:'Times New Roman', Times, serif;
+                font-weight: bold;
+            }
+            
+            .card img {
+                max-height: 300px;
+                object-fit: contain;
+            }
 
-        .card img {
-            max-height: 300px;
-            object-fit: contain;
-        }
+            .item-details h5 {
+                font-size: 18px;
+                font-weight: bold;
+                padding-top: 30px;
+            }
 
-        .item-details h5 {
-            font-size: 18px;
-            font-weight: bold;
-        }
+            .item-details p {
+                margin: 0;
+                font-size: 14px;
+                color: gray;
+            }
 
-        .item-details p {
-            margin: 0;
-            font-size: 14px;
-            color: gray;
-        }
+            .price {
+                font-size: 18px;
+                font-weight: bold;
+                color: #ff5722;
+            }
 
-        .price {
-            font-size: 18px;
-            font-weight: bold;
-            color: #ff5722;
-        }
+            .total-price {
+                font-size: 18px;
+                font-weight: bold;
+                color: rgb(22, 224, 22);
+            }
+            .total-price span {
+                color: rgb(22, 208, 22) !important; /* Explicitly set color for the span */
+            }
 
-        .total-price {
-            font-size: 18px;
-            font-weight: bold;
-            color: #28a745;
-        }
+            .quantity-input {
+                display: inline-block;
+                width: 60px;
+            }
 
-        .quantity-input {
-            display: inline-block;
-            width: 60px;
-        }
+            .btn-buy {
+                background-color: #ff5722;
+                color: white;
+                font-weight: bold;
+                border-radius: 5px;
+                padding: 10px 20px;
+                margin-top: 50px;
+                width: 100%;
+            }
 
-        .btn-buy {
-            background-color: #ff5722;
-            color: white;
-            font-weight: bold;
-            border-radius: 5px;
-            padding: 10px 20px;
-            width: 100%;
-        }
+            .btn-buy:hover {
+                background-color: #e64a19;
+            }
 
-        .btn-buy:hover {
-            background-color: #e64a19;
-        }
+            .modal-footer a {
+                text-decoration: none;
+                color: #007bff;
+            }
 
-        .modal-footer a {
-            text-decoration: none;
-            color: #007bff;
-        }
+            .modal-footer a:hover {
+                text-decoration: underline;
+            }
 
-        .modal-footer a:hover {
-            text-decoration: underline;
-        }
-    </style>
-</head>
+            .adcard{
+                color: #e64a19;
+                font-family:'Times New Roman', Times, serif;
+                font-weight: bold;
+            }
+        </style>
 
-<body>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        
+    </head>
 
-    <div class="container">
-        <h3 class="mb-4">Buy Product</h3>
-        <form id="buy-product-form" method="POST" action="{{ url_for('main.confirm_order', product_id=product.id) }}">
-            <div class="row">
-                <!-- Product Card -->
-                <div class="col-md-8">
-                    <div class="card p-3">
-                        <div class="row">
-                            <div class="col-md-5">
-                                <!-- Product Image -->
-                                <img src="{{ new_link }}" alt="{{ product.name }}" class="img-fluid">
-                            </div>
-                            <div class="col-md-7 item-details">
-                                <!-- Product Details -->
-                                <h5>{{ product.name }}</h5>
-                                <p>Product details and description...</p>
-                                <p class="price">Price: Rs {{ product.price }}</p>
+    <body>
 
-                                <!-- Quantity Selector -->
-                                <div class="form-group">
-                                    <label for="quantity">Quantity</label>
-                                    <input type="number" id="quantity" name="quantity" class="form-control quantity-input" value="1" min="1">
+        <div class="container">
+            <h3  class="mb-4 buyp">Buy Product</h3>
+            <form id="buy-product-form" method="POST" action="{{ url_for('main.confirm_order', product_id=product.id) }}">
+                <div class="row">
+                    <!-- Product Card (Left Side) -->
+                    <div class="col-md-8">
+                        <div class="card p-3">
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <!-- Product Image -->
+                                    <img src="{{ new_link }}" alt="{{ product.name }}" class="img-fluid">
                                 </div>
-
-                                <!-- Total Price -->
-                                <p class="total-price">Total Price: Rs <span id="total-price">{{ product.price }}</span></p>
-
-                                <!-- Place Order Button -->
-                                <button type="submit" class="btn btn-buy">Place Order</button>
+                                <div class="col-md-7 item-details">
+                                    <h5>{{ product.name }}</h5>
+                                    <p class="price">Price: Rs {{ product.price }}</p>
+        
+                                    <!-- Quantity Selector -->
+                                    <div class="form-group">
+                                        <label for="quantity">Quantity</label>
+                                        <input type="number" id="quantity" name="quantity" class="form-control quantity-input" value="1" min="1">
+                                    </div>
+        
+                                    <!-- Total Price -->
+                                    <p class="total-price" style="color: rgb(18, 181, 18);">Total Price: <span id="total-price">Rs {{ product.price }}</span></p>
+        
+                                    <!-- Place Order Button -->
+                                    <button type="submit" class="btn btn-buy">Place Order</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+        
+                    <!-- Address Card (Right Side) -->
+                    <div class="col-md-4">
+                        <div class="card p-3 address-form">
+                            <h4 class="adcard">Enter Delivery Address</h4>
+                            <div class="form-group">
+                                <label for="address"  style="font-weight:bold">Address</label>
+                                <textarea id="address" name="address" class="form-control" rows="4" placeholder="Enter your delivery address here" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone" style="font-weight: bold;">Phone Number</label>
+                                <input type="text" id="phone" name="phone" class="form-control" placeholder="Enter your phone number" required>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </form>
-    </div>
-
-    <!-- Success Modal -->
-    <div class="modal" tabindex="-1" role="dialog" id="orderSuccessModal">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Order Placed</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <p>Your order has been placed successfully.</p>
-                </div>
-                <div class="modal-footer">
-                    <p style="color: blue; " >Will be directed to the home page !!!</p>
+            </form>
+        </div>
+        
+        <!-- Success Modal -->
+        <div class="modal" tabindex="-1" role="dialog" id="orderSuccessModal">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Order Placed</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Your order has been placed successfully.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <p style="color: blue;">Will be directed to the home page !!!</p>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+        
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.1/dist/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.1/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
-    <!-- Quantity and Total Price Update Script -->
-    <script>
-        $('#quantity').on('input', function () {
-            var price = parseFloat('{{ product.price }}');
-            var quantity = parseInt($(this).val()) || 1;
-            var totalPrice = quantity * price;
-            $('#total-price').text(totalPrice.toFixed(2));
-        });
 
-        // Handle Form Submission and Show Modal
-        $('#buy-product-form').submit(function (event) {
-            event.preventDefault(); // Prevent default form submission
+        <!-- Validation & Order Submission Script -->
+        <script>
+            document.getElementById('buy-product-form').addEventListener('submit', function (event) {
+                var address = document.getElementById('address').value.trim();
+                if (address === "") {
+                    alert("Please enter your delivery address before placing the order.");
+                    event.preventDefault(); // Prevent form submission
+                    return;
+                }
+        
+                // Show Success Modal
+                $('#orderSuccessModal').modal('show');
+        
+                // Submit Form After Modal (Delay of 3 seconds)
+                setTimeout(function () {
+                    document.getElementById('buy-product-form').submit();
+                }, 3000);
+            });
+        
+            // Update total price dynamically
+            document.getElementById('quantity').addEventListener('input', function () {
+                var price = parseFloat('{{ product.price }}');
+                var quantity = parseInt(this.value) || 1;
+                var totalPrice = quantity * price;
+                document.getElementById('total-price').textContent = totalPrice.toFixed(2);
+            });
 
-            // Show Success Modal
-            $('#orderSuccessModal').modal('show');
 
-            // Optional: Submit Form After Modal
-            setTimeout(function () {
-                $('#buy-product-form')[0].submit();
-            }, 3000);
-        });
-    </script>
+            document.querySelector('.btn-buy').addEventListener('click', function (e) {
+                e.preventDefault();
+        
+                var productPrice = parseFloat('{{ product.price }}');
+                var quantity = parseInt(document.getElementById('quantity').value) || 1;
+                var totalAmount = productPrice * quantity * 100; // Convert to paise
+        
+                var userName = "{{ current_user.name }}";
+                var userEmail = "{{ current_user.email }}";
+        
+                var options = {
+                    "key": "rzp_test_FuqIwgrQeAAtNt", // Replace with your Razorpay Key ID
+                    "amount": totalAmount,
+                    "currency": "INR",
+                    "name": userName,
+                    "description": "Product Purchase",
+                    "image": "https://example.com/your_logo.png",
+                    "handler": function (response) {
+                        alert("Payment successful. Payment ID: " + response.razorpay_payment_id);
+        
+                        // Submit form after successful payment
+                        document.getElementById('buy-product-form').submit();
+                    },
+                    "prefill": {
+                        "name": userName,
+                        "email": userEmail,
+                        "contact": "8606422387"
+                    },
+                    "theme": {
+                        "color": "#F37254"
+                    }
+                };
+        
+                var rzp = new Razorpay(options);
+                rzp.open();
+            });
 
-</body>
 
-</html>
+
+        </script>
+        
+
+    </body>
+
+    </html>

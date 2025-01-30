@@ -1,15 +1,19 @@
 import os
-from flask import Blueprint, request, render_template, redirect, url_for, flash, session
+import razorpay
+from flask import Blueprint, request, render_template, redirect, url_for, flash, session,jsonify
 from werkzeug.security import check_password_hash,generate_password_hash
 from werkzeug.utils import secure_filename
 from flask_login import login_required, current_user,logout_user
-from .models import User,Product,Order
+from .models import User,Product,Order,Cart
 from pytz import timezone
 from flask_login import LoginManager,  login_user, login_required, logout_user, current_user
 from . import db
 from sqlalchemy import desc
 
 main = Blueprint('main', __name__)
+
+
+client = razorpay.Client(auth=("rzp_test_FuqIwgrQeAAtNt", "givvUW1Irf4fQqXnFd3UITXr"))
 
 @main.route('/')
 def home():
@@ -19,6 +23,11 @@ def home():
 login_manager = LoginManager(main)
 login_manager.init_app(main)
 login_manager.login_view = 'login'
+
+
+@main.route('/blog')
+def blog():
+    return render_template('blog.html')
 
 
 
@@ -40,6 +49,7 @@ def register():
         return redirect(url_for('main.login'))
 
     return render_template('register.html')
+
 
 
 
@@ -270,6 +280,104 @@ def cancel_order(order_id):
     return redirect(url_for('main.order_details'))
 
 
+
+
+@main.route('/add_to_cart/<int:product_id>', methods=['POST'])
+@login_required
+def add_to_cart(product_id):
+    product = Product.query.get_or_404(product_id)
+
+    cart_item = Cart.query.filter_by(user_id=current_user.id, product_id=product.id).first()
+    if cart_item:
+        cart_item.quantity += 1  
+    else:
+        cart_item = Cart(user_id=current_user.id, product_id=product.id, quantity=1)
+        db.session.add(cart_item)
+
+    db.session.commit()
+    flash(f'Added {product.name} to cart!', 'success')
+    return redirect(url_for('main.user_dashboard'))
+
+
+@main.route('/cart')
+@login_required
+def cart():
+    # Fetch cart items and calculate total price
+    cart_items = db.session.query(Cart, Product).join(Product, Cart.product_id == Product.id).filter(Cart.user_id == current_user.id).all()
+    total_price = sum(cart.quantity * product.price for cart, product in cart_items)
+
+    # Razorpay order creation for testing
+    order_data = {
+        "amount": int(total_price * 100),  # Convert total price to paise
+        "currency": "INR",
+        "payment_capture": 1  # Auto-capture payment
+    }
+    order = client.order.create(order_data)
+    order_id = order['id']  # Get generated order ID
+
+    return render_template('add_to_cart.html',
+                           cart_items=cart_items,
+                           total_price=total_price,
+                           order_id=order_id,
+                           user_name=current_user.name,
+                           user_email=current_user.email)
+
+
+
+
+@main.route('/remove_from_cart/<int:cart_id>', methods=['POST'])
+@login_required
+def remove_from_cart(cart_id):
+    cart_item = Cart.query.get_or_404(cart_id)
+    
+    if cart_item.user_id != current_user.id:
+        flash("Unauthorized action!", "danger")
+        return redirect(url_for('main.cart'))
+
+    db.session.delete(cart_item)
+    db.session.commit()
+    
+    flash("Item removed from cart successfully!", "success")
+    return redirect(url_for('main.cart'))
+
+
+
+@main.route('/verify_payment', methods=['POST'])
+def verify_payment():
+    payment_id = request.form['razorpay_payment_id']
+    order_id = request.form['razorpay_order_id']
+    signature = request.form['razorpay_signature']
+
+    # Create a dictionary for verification
+    data = {
+        'razorpay_order_id': order_id,
+        'razorpay_payment_id': payment_id,
+        'razorpay_signature': signature
+    }
+
+    # Verify the signature
+    try:
+        client.utility.verify_payment_signature(data)
+        return "Payment Verified"
+    except razorpay.errors.SignatureVerificationError:
+        return "Payment Failed"
+
+
+
+@main.route('/create_order', methods=['POST'])
+def create_order():
+    # Get the total amount to be paid
+    amount = request.form['amount']  # You can calculate the total amount here
+
+    # Razorpay API to create an order
+    order_data = {
+        "amount": amount * 100,  # Razorpay requires the amount in paise (1 INR = 100 paise)
+        "currency": "INR",
+        "payment_capture": 1
+    }
+
+    order = client.order.create(data=order_data)
+    return jsonify(order)
 
 
 
